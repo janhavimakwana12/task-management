@@ -1,9 +1,23 @@
+'use client';
+import React from "react";
 import Input from "../Input";
 import TaskList from "./TaskList";
+import Modal from "../Modal";
+import AddEditTask from "./AddEditTask";
+import { TODO_TYPES } from "@/types";
 
 export default function Tasks(){
+    const [isModalOpen, setModalOpen] = React.useState<boolean>(false);
+
+    const handleModal = () => {
+        setModalOpen(!isModalOpen);
+    }
+
     return <div className="p-4 flex flex-col">
-        <button className="bg-blue-600 rounded-md text-white text-sm py-1 px-2 w-40">Add Task</button>
+        <button onClick={handleModal} className="bg-blue-600 rounded-md text-white text-sm py-1 px-2 w-40">Add Task</button>
+        <Modal isOpen={isModalOpen} onClose={handleModal}>
+            <AddEditTask type={TODO_TYPES.Add} handleModal={handleModal} />
+        </Modal>
         <div className="my-2 py-2 px-2 flex flex-row justify-between rounded-md shadow-md shadow-gray-300">
             <div className="flex flex-row items-center">
                 <span className="mr-2 font-semibold text-sm">Search:</span>

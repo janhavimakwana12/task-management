@@ -8,8 +8,7 @@ export async function POST(req: NextRequest){
     if(!token){
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const newTask = await axios.post(`http://localhost:4000/tasks`, { title, description, status: "pending" });
+    const newTask = await axios.post(`http://localhost:4000/tasks`, { title, description, status: "pending", createdAt: new Date().toISOString() });
     return NextResponse.json({ message: "Task created successfully", task: newTask.data });
 }
 

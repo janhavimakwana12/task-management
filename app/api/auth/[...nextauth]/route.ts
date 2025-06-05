@@ -12,9 +12,6 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     secret: process.env.NEXTAUTH_SECRET,
-    // pages: {
-    //     signIn: '/login'
-    // },
     callbacks:{
         async signIn({user}){
             const res = await axios.get(`http://localhost:4000/users?email=${user.email}`);

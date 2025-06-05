@@ -5,7 +5,6 @@ import { getToken } from 'next-auth/jwt'
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const isApiRoute = pathname.startsWith('/api');
-
     if(isApiRoute){
         return NextResponse.next();
     }

@@ -1,6 +1,5 @@
 
 
-
 export default function TaskDetails(){
     return (
         <div className="h-80 w-60 flex flex-col">

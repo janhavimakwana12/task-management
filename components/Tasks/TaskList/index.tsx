@@ -10,8 +10,8 @@ export default function TaskList(props: {type:string;}){
         <Task description="Description 1 Reprehenderit sunt exercitation anim adipisicing consectetur ipsum. Culpa consequat veniam minim consectetur quis voluptate laboris id ullamco ut quis nisi officia. Duis minim dolor dolore anim aliqua elit est. Fugiat do quis adipisicing in ad voluptate ex non cupidatat." />
         <Task description="Description 2"/>
         <Task description="Description 3" />
-        <Modal isOpen={true} onClose={() => {}}>
+        {/* <Modal isOpen={true} onClose={() => {}}>
             <AddEditTask type={TODO_TYPES.Edit} />
-        </Modal>
+        </Modal> */}
     </div>
 }
