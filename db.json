@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "id": "b67d",
+      "email": "abc@123.com",
+      "name": "Janhavi Makwana",
+      "password": "Abc@123.com",
+      "authProvider": "email",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFiY0AxMjMuY29tIiwiaWF0IjoxNzQ5MTE5MTc1LCJleHAiOjE3NDkxMjI3NzV9.pMTA27B7L4BJ3vDfkAYpWkgg2GJGDW9NE3NLMXnqVgA"
+    },
+    {
+      "id": "cd36"
+    }
+  ],
+  "tasks": []
+}
