@@ -4,7 +4,8 @@ import { getToken } from "next-auth/jwt";
 
 export async function POST(req: NextRequest){
     const { title, description } = await req.json();
-    const token = req.cookies.get('token')?.value || await getToken({ req: req, secret: process.env.NEXTAUTH_SECRET });
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.split(' ')[1]
     if(!token){
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -13,6 +14,11 @@ export async function POST(req: NextRequest){
 }
 
 export async function GET(req: NextRequest){
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.split(' ')[1]
+    if(!token){
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try{
         const tasks = await axios.get('http://localhost:4000/tasks');
         return NextResponse.json({tasks: tasks.data});

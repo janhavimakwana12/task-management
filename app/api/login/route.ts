@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import axios from "axios";
 import { generateToken } from "@/utils/functions";
 
@@ -14,11 +13,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
   const token = generateToken(email);
-  (await cookies()).set("auth_token", token, {
-    httpOnly: true,
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
-
-  return NextResponse.json({ message: "Login successful", user });
+  return NextResponse.json({ message: "Login successful", user, token });
 }

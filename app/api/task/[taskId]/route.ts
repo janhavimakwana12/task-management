@@ -3,7 +3,8 @@ import axios from "axios";
 
 
 export async function PATCH(req: NextRequest, { params }: { params: { taskId: string } }) {
-    const token = req.cookies.get('token')?.value;
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.split(' ')[1]
 
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -24,7 +25,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { taskId: st
 }
 
 export async function GET(req: NextRequest, { params }: { params: { taskId: string } }) {
-    const token = req.cookies.get('token')?.value;
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.split(' ')[1]
 
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -43,14 +45,15 @@ export async function GET(req: NextRequest, { params }: { params: { taskId: stri
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { taskId: string } }) {
-    const token = req.cookies.get('token')?.value;
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader?.split(' ')[1]
 
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     try{
         await axios.delete(
-            `http://localhost:4000/tasks?id=${params.taskId}`
+            `http://localhost:4000/tasks/${params.taskId}`
             );
         return NextResponse.json({ message: "Task deleted successfully" });
     }catch(error){

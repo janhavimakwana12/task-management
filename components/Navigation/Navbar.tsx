@@ -1,12 +1,14 @@
-import { cookies } from "next/headers"
+export const dynamic = "force-dynamic";
+
+import { cookies } from "next/headers";
 import NavLinks from "./NavLinks";
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 export default async function Navbar(){
     const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-    const session = await getServerSession(authOptions)
+    const token = cookieStore.get('auth_token')?.value;
+    const session = await getServerSession(authOptions);
     const isLoggedIn = !!token || !!session;
 
     return <nav className="bg-blue-600">

@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { TODO_TYPES } from "@/types";
+import { Task, TODO_TYPES } from "@/types";
+import api from "@/utils/api";
 interface Props {
   type: TODO_TYPES;
-  handleModal: () => void;
+  onClose: () => void;
+  task?: Task
 }
 
 type FormValues = {
@@ -17,10 +19,25 @@ export default function AddEditTask(props: Props) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({
+    defaultValues:{
+      title: props.task?.title ?? "",
+      description: props.task?.description ?? ""
+    }
+  });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Submitted data:", data);
+  const onSubmit = async(data: FormValues) => {
+    try{
+      if(props.type === TODO_TYPES.Add){
+        await api.post('/api/task', data);
+      }else{
+        await api.patch(`/api/task/${props?.task?.id}`, data);
+      }
+    }catch(error){
+      console.log(error);
+    }finally{
+      props.onClose();
+    }
   };
 
   return (
@@ -67,7 +84,7 @@ export default function AddEditTask(props: Props) {
         </button>
         <button
           className="cursor-pointer bg-gray-300 text-sm py-1 px-2 rounded-md font-medium"
-          onClick={props.handleModal}
+          onClick={props.onClose}
         >
           Cancel
         </button>
