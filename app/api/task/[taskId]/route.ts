@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
 
-export async function PUT(req: NextRequest, { params }: { params: { taskId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { taskId: string } }) {
     const token = req.cookies.get('token')?.value;
 
     if (!token) {
@@ -12,12 +12,13 @@ export async function PUT(req: NextRequest, { params }: { params: { taskId: stri
 
     const { title, description } = await req.json();
     try{
-        const res = await axios.put(
-            `http://localhost:4000/tasks?id=${taskId}`, {title, description}
+        const res = await axios.patch(
+            `http://localhost:4000/tasks/${taskId}`, {title, description}
             );
             const taskDetails = res.data[0];
             return NextResponse.json({ taskDetails, message: "Task updated successfully" });
     }catch(error){
+        console.log(error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
