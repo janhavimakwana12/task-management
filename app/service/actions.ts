@@ -3,14 +3,12 @@ import { redirect } from "next/navigation";
 import { LoginFormValues, SignupFormValues } from "@/types";
 import api from "@/utils/api";
 import { cookies } from "next/headers";
-import toast from 'react-hot-toast'
 
 export async function logout(){
     try{
         (await cookies()).delete('auth_token')
-        redirect('/login');
     }catch(error){
-        toast.error("Error logging out");
+       console.log("##error",error);
     }
 }
 

@@ -3,14 +3,16 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { logout } from "@/app/service/actions";
+import { useRouter } from 'next/navigation'
 
 export default function NavLinks (props: {isLoggedIn: boolean}) {
     const pathname = usePathname();
-
+    const router = useRouter()
     const handleLogout = async() => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
         await logout();
+        router.push('/login');
         await signOut();
     }
 

@@ -1,5 +1,4 @@
-export const dynamic = "force-dynamic";
-
+'use server'
 import { cookies } from "next/headers";
 import NavLinks from "./NavLinks";
 import { getServerSession } from 'next-auth';
