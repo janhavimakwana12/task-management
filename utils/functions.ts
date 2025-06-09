@@ -19,3 +19,7 @@ export const formatDate = (date: string) => {
         timeZone: 'Asia/Kolkata',
       })
 }
+
+export const getTaskTypes = () => {
+    return ["todo", "inprogress", "done"];
+}

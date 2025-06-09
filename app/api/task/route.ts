@@ -6,11 +6,15 @@ export async function POST(req: NextRequest){
     const { title, description } = await req.json();
     const authHeader = req.headers.get('Authorization')
     const token = authHeader?.split(' ')[1]
-    if(!token){
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    try{
+        if(!token){
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const newTask = await axios.post(`http://localhost:4000/tasks`, { title, description, status: "todo", createdAt: new Date().toISOString(), id: Date.now().toString() });
+        return NextResponse.json({ message: "Task created successfully", task: newTask.data });
+    }catch(error){
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
-    const newTask = await axios.post(`http://localhost:4000/tasks`, { title, description, status: "pending", createdAt: new Date().toISOString() });
-    return NextResponse.json({ message: "Task created successfully", task: newTask.data });
 }
 
 export async function GET(req: NextRequest){
@@ -23,6 +27,6 @@ export async function GET(req: NextRequest){
         const tasks = await axios.get('http://localhost:4000/tasks');
         return NextResponse.json({tasks: tasks.data});
     }catch(error){
-        return NextResponse.json({error: "Internal Server Error"}, {status: 500});
+        return NextResponse.json({message: "Internal Server Error"}, {status: 500});
     }
 }

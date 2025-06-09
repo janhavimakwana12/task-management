@@ -3,6 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Task, TODO_TYPES } from "@/types";
 import api from "@/utils/api";
+import toast from 'react-hot-toast'
 interface Props {
   type: TODO_TYPES;
   onClose: () => void;
@@ -33,8 +34,8 @@ export default function AddEditTask(props: Props) {
       }else{
         await api.patch(`/api/task/${props?.task?.id}`, data);
       }
-    }catch(error){
-      console.log(error);
+    }catch(error:any){
+      toast.error(error.response.data.message);
     }finally{
       props.onClose();
     }

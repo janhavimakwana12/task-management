@@ -4,8 +4,8 @@ export enum TODO_TYPES  {
 }
 
 export enum TASK_STATUS {
-    Pending = "pending",
-    InProgress = "in progress",
+    Todo = "todo",
+    InProgress = "inprogress",
     Done = "done"
 }
 

@@ -9,6 +9,9 @@ import { TASK_STATUS, TODO_TYPES } from "@/types";
 import api from "@/utils/api";
 import { Task } from "@/types";
 import DeleteTask from "./DeleteTask";
+import toast from 'react-hot-toast';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { getTaskTypes } from "@/utils/functions";
 
 export default function Tasks(){
     const [isAddModalOpen, setAddModalOpen] = useState<boolean>(false);
@@ -19,6 +22,7 @@ export default function Tasks(){
     const [tasks, setTasks] = useState<Task[]>([]);
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
+    const [sortBy, setSortBy] = useState('recent');
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -30,13 +34,17 @@ export default function Tasks(){
 
       useEffect(() => {
         const fetchTasks = async () => {
-          if (debouncedQuery.trim() === '') {
-            const res = await api.get('/api/task')
-            setTasks(res.data.tasks)
-          } else {
-            const res = await api.get(`/api/task/search?q=${encodeURIComponent(debouncedQuery)}`)
-            setTasks(res.data.tasks)
-          }
+            try{
+                if (debouncedQuery.trim() === '') {
+                    const res = await api.get('/api/task')
+                    setTasks(res.data.tasks)
+                } else {
+                    const res = await api.get(`/api/task/search?q=${encodeURIComponent(debouncedQuery)}`)
+                    setTasks(res.data.tasks)
+                }
+            }catch(error:any){
+                toast.error(error.response.data.message);
+              }
         }
 
         fetchTasks()
@@ -69,8 +77,27 @@ export default function Tasks(){
         setSelectedTask(task);
     }, []);
 
+    const handleDragEnd = useCallback(async(result: DropResult) => {
+
+        const {destination, source, draggableId} = result;
+        if (!destination || destination.droppableId === source.droppableId) return
+
+        try {
+          setTasks(prev =>
+            prev.map(task =>
+              task.id === draggableId ? { ...task, status: destination.droppableId as Task['status'] } : task
+            )
+          )
+          await api.patch(`/api/task/${draggableId}/status`, {
+            status: destination.droppableId,
+          })
+        } catch (error) {
+          toast.error('Could not update task status')
+        }
+    }, []);
+
     return <div className="p-4 flex flex-col">
-        <button onClick={handleModal} className="cursor-pointer bg-blue-600 rounded-md text-white text-sm py-1 px-2 w-40">Add Task</button>
+        <button onClick={handleModal} className="cursor-pointer bg-blue-600 rounded-md text-white text-sm py-1 px-2 w-full md:w-40">Add Task</button>
         <Modal isOpen={isAddModalOpen} onClose={handleClose}>
             <AddEditTask type={TODO_TYPES.Add} onClose={handleClose} />
         </Modal>
@@ -83,31 +110,56 @@ export default function Tasks(){
         <Modal isOpen={isDeleteModalOpen} onClose={handleClose}>
             <DeleteTask task={selectedTask} onClose={handleClose} />
         </Modal>
-        <div className="my-2 py-2 px-2 flex flex-row justify-between rounded-md shadow-md shadow-gray-300">
+        <div className="my-2 py-2 px-2 flex md:flex-row flex-col justify-between rounded-md shadow-md shadow-gray-300 ">
             <div className="flex flex-row items-center">
                 <span className="mr-2 font-semibold text-sm">Search:</span>
                 <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search..."
-                className="w-90 rounded-sm" />
+                className="md:w-90 w-full rounded-sm" />
             </div>
-            <div className="flex flex-row items-center justify-end w-full">
+            <div className="flex flex-row items-center justify-end w-full mt-2 md:mt-0">
                 <span className="mr-2 font-semibold text-sm">Sort By:</span>
                 <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
                     className="w-20 px-2 h-8 border rounded-md bg-white text-sm text-gray-700 focus:outline-none"
                 >
-                <option value="">Recent</option>
+                <option value="recent">Recent</option>
                 <option value="todo">To Do</option>
                 <option value="inprogress">In Progress</option>
                 <option value="done">Done</option>
                 </select>
             </div>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-            <TaskList type="todo" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.Pending)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
-            <TaskList type="in progress" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.InProgress)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
-            <TaskList type="done" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.Done)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd} >
+            <div className="grid grid-cols-3 gap-2">
+                <Droppable droppableId="todo" key="todo" direction="vertical">
+                    {(provided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <TaskList  type="todo" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.Todo)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
+                            {provided.placeholder}
+                            </div>
+                    )}
+                </Droppable>
+                <Droppable droppableId="inprogress" key="inprogress" direction="vertical">
+                    {(provided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <TaskList type="in progress" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.InProgress)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
+                            {provided.placeholder}
+                            </div>
+                    )}
+                </Droppable>
+                <Droppable droppableId="done" key="done" direction="vertical">
+                    {(provided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <TaskList type="done" tasks={tasks.filter((task: Task) => task.status === TASK_STATUS.Done)} onViewDetails={handleViewDetails} onEdit={handleEdit} onDelete={handleDelete} />
+                            {provided.placeholder}
+                            </div>
+                    )}
+                </Droppable>
+            </div>
+        </DragDropContext>
     </div>
 }

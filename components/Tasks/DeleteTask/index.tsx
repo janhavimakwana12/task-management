@@ -1,6 +1,6 @@
 import { Task } from "@/types";
 import api from "@/utils/api";
-
+import toast from 'react-hot-toast'
 interface Props {
     task: Task | null;
     onClose: () => void;
@@ -10,9 +10,10 @@ export default function DeleteTask(props: Props){
     const handleDelete = async () => {
         try{
             await api.delete(`/api/task/${props.task?.id}`);
-        }catch(error){
-            console.log(error);
-        }finally{
+            toast.success("Task deleted successfully");
+        }catch(error:any){
+            toast.error(error.response.data.message);
+          }finally{
             props.onClose();
         }
     };

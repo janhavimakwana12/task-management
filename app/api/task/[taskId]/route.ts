@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
-
 export async function PATCH(req: NextRequest, { params }: { params: { taskId: string } }) {
     const authHeader = req.headers.get('Authorization')
     const token = authHeader?.split(' ')[1]
@@ -19,8 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { taskId: st
             const taskDetails = res.data[0];
             return NextResponse.json({ taskDetails, message: "Task updated successfully" });
     }catch(error){
-        console.log(error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -40,7 +38,7 @@ export async function GET(req: NextRequest, { params }: { params: { taskId: stri
 
             return NextResponse.json({ taskDetails });
     }catch(error){
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
 
@@ -57,7 +55,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { taskId: s
             );
         return NextResponse.json({ message: "Task deleted successfully" });
     }catch(error){
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
 

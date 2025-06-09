@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navigation/Navbar";
 import "./globals.css";
+import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,6 +18,16 @@ export default function RootLayout({
       <body
       className="font-sans"
       >
+      <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 4000,
+        style: {
+          fontSize: '0.875rem',
+          borderRadius: '8px',
+        },
+      }}
+    />
         <Navbar/>
         {children}
       </body>

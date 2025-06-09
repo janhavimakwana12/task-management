@@ -7,6 +7,7 @@ import { SignupFormValues } from "@/types";
 import { signup } from "@/app/service/actions";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from 'react-hot-toast'
 
 export default function Signup() {
   const {
@@ -25,7 +26,7 @@ export default function Signup() {
       await axios.post('/api/sync-token', { token: response.token })
       router.push('/tasks');
     }catch(error){
-      console.log(error);
+      toast.error("Error signing up");
     }
   };
 

@@ -7,6 +7,7 @@ import { LoginFormValues } from "@/types";
 import { login } from "@/app/service/actions";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from 'react-hot-toast'
 
 export default function Login() {
   const {
@@ -24,7 +25,8 @@ export default function Login() {
       await axios.post('/api/sync-token', { token: response.token })
       window.location.href = '/tasks';
     }catch(error){
-      console.log(error);
+      const err = error as any;
+      toast.error(err.message)
     }
   };
 

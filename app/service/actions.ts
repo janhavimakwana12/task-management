@@ -3,13 +3,14 @@ import { redirect } from "next/navigation";
 import { LoginFormValues, SignupFormValues } from "@/types";
 import api from "@/utils/api";
 import { cookies } from "next/headers";
+import toast from 'react-hot-toast'
 
 export async function logout(){
     try{
         (await cookies()).delete('auth_token')
         redirect('/login');
     }catch(error){
-        console.log(error);
+        toast.error("Error logging out");
     }
 }
 
@@ -23,9 +24,12 @@ export async function signup(formData: SignupFormValues){
 }
 
 export async function login(formData: LoginFormValues){
-    const response = await api.post('http://localhost:3000/api/login', {
-        email: formData.email,
-        password: formData.password
-    });
-    return response.data;
+    return await api.post('http://localhost:3000/api/login', {
+            email: formData.email,
+            password: formData.password
+        }).then((res) => {
+            return res.data;
+        }).catch((error) => {
+            throw(new Error(error.response.data.message));
+        });
 }
