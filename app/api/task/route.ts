@@ -24,8 +24,11 @@ export async function GET(req: NextRequest){
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     try{
-        const tasks = await axios.get('http://localhost:4000/tasks');
-        return NextResponse.json({tasks: tasks.data});
+        const res = await axios.get('http://localhost:4000/tasks');
+        let tasks = res.data.sort((a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+        return NextResponse.json({tasks: tasks});
     }catch(error){
         return NextResponse.json({message: "Internal Server Error"}, {status: 500});
     }

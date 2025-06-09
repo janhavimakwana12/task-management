@@ -22,7 +22,7 @@ export default function Tasks(){
     const [tasks, setTasks] = useState<Task[]>([]);
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
-    const [sortBy, setSortBy] = useState('recent');
+    const [sortBy, setSortBy] = useState('');
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -32,21 +32,21 @@ export default function Tasks(){
         return () => clearTimeout(timer)
       }, [query])
 
-      useEffect(() => {
-        const fetchTasks = async () => {
-            try{
-                if (debouncedQuery.trim() === '') {
-                    const res = await api.get('/api/task')
-                    setTasks(res.data.tasks)
-                } else {
-                    const res = await api.get(`/api/task/search?q=${encodeURIComponent(debouncedQuery)}`)
-                    setTasks(res.data.tasks)
-                }
-            }catch(error:any){
-                toast.error(error.response.data.message);
-              }
+      const fetchTasks = useCallback(async() => {
+        try{
+            if(debouncedQuery.trim() === ''){
+                const res = await api.get('/api/task')
+                setTasks(res.data.tasks)
+            }else {
+                const res = await api.get(`/api/task/search?q=${encodeURIComponent(debouncedQuery)}`)
+                setTasks(res.data.tasks)
+            }
+        }catch(error:any){
+            toast.error(error.response.data.message);
         }
+      }, [debouncedQuery])
 
+      useEffect(() => {
         fetchTasks()
       }, [debouncedQuery, isAddModalOpen, isEditModalOpen, isDeleteModalOpen])
 
@@ -96,6 +96,21 @@ export default function Tasks(){
         }
     }, []);
 
+    const handleSort = useCallback(async(q: string) => {
+        setSortBy(q);
+        if(q === 'recent'){
+            fetchTasks()
+        }else{
+            const res = await api.get(`/api/task/search?queryStatus=${q}`);
+            setTasks(res.data.tasks);
+        }
+    }, [sortBy]);
+
+    const handleSearch = useCallback((q: string) => {
+        setQuery(q);
+        setSortBy('recent');
+    }, [query]);
+
     return <div className="p-4 flex flex-col">
         <button onClick={handleModal} className="cursor-pointer bg-blue-600 rounded-md text-white text-sm py-1 px-2 w-full md:w-40">Add Task</button>
         <Modal isOpen={isAddModalOpen} onClose={handleClose}>
@@ -115,7 +130,7 @@ export default function Tasks(){
                 <span className="mr-2 font-semibold text-sm">Search:</span>
                 <Input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search..."
                 className="md:w-90 w-full rounded-sm" />
             </div>
@@ -123,7 +138,7 @@ export default function Tasks(){
                 <span className="mr-2 font-semibold text-sm">Sort By:</span>
                 <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e) => handleSort(e.target.value)}
                     className="w-20 px-2 h-8 border rounded-md bg-white text-sm text-gray-700 focus:outline-none"
                 >
                 <option value="recent">Recent</option>
